@@ -8,7 +8,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import socket
 import threading
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 USERS_FILE = "users.json"
 SHADOWS_FILE = "shadows.txt"
@@ -20,18 +20,18 @@ ph = PasswordHasher()
 with open("secret.key", "rb") as f:
     fernet = Fernet(f.read())
 
-#Function to load users
+#Function to load users (file is encrypted at rest)
 def load_users():
     try:
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
+        with open(USERS_FILE, "rb") as f:
+            return json.loads(fernet.decrypt(f.read()))
+    except (FileNotFoundError, InvalidToken, json.JSONDecodeError):
         return []
 
 #Function to save users
 def save_users(users):
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f, indent=4)
+    with open(USERS_FILE, "wb") as f:
+        f.write(fernet.encrypt(json.dumps(users, indent=4).encode()))
 
 def main():
     print("1. Login")
@@ -56,11 +56,11 @@ def main():
             #Loads shadows.txt
             shadows = {}
             try:
-                with open(SHADOWS_FILE, "r") as f:
-                    for line in f:
+                with open(SHADOWS_FILE, "rb") as f:
+                    for line in fernet.decrypt(f.read()).decode().splitlines():
                         shadow_username, hashed_password = line.strip().split(":", 1)
                         shadows[shadow_username] = hashed_password
-            except FileNotFoundError:
+            except (FileNotFoundError, InvalidToken):
                 pass
             #Checks if username is in shadows.txt
             if Username not in shadows:
@@ -108,7 +108,6 @@ def main():
             save_users(users)
             with open("log.txt", "a") as f:
                 f.write(f"Account logged in: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
-
             print("Login successful!")
             #Connect to the server
             Display_Name = next((user["display_name"] for user in users if user["username"] == Username), Username)
@@ -118,8 +117,7 @@ def main():
                 sock.sendall(fernet.encrypt(Display_Name.encode()))
                 print(f"Connected to chat server as {Display_Name}.")
                 print(f"List of commands:\nlogout\nlist\nmsg <username> <message>\n------------------------")
-
-                #Thread to print anything the server sends (list replies, incoming messages)
+                #Prints messages
                 def receive():
                     while True:
                         data = sock.recv(1024)
@@ -127,7 +125,6 @@ def main():
                             break
                         print(fernet.decrypt(data).decode())
                 threading.Thread(target=receive, daemon=True).start()
-
                 #Loop for commands the user will send
                 while True:
                     command = input()
@@ -158,7 +155,6 @@ def main():
             print("Password must be at least 14 characters, include an uppercase letter, number, and a special character.")
 
         Display_Name = input("Choose a display name: ") #This is not used for login
-
         #Load users.json
         users = load_users()
         #Username check
@@ -176,13 +172,18 @@ def main():
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "last_login": datetime.now(timezone.utc).isoformat(), #Leaving this empty might break it so I just set it too created_at time just in case
             }
-
             #Appends the array to the json file then saves it.
             users.append(new_user)
             save_users(users)
-
-            with open(SHADOWS_FILE, "a") as f: #Opens shadows.txt
-                f.write(f"{Username}:{ph.hash(Password)}\n") #apprends username, then the hashed password using Argon2 (which also hashes)
+            #Appends to shadows.txt
+            try:
+                with open(SHADOWS_FILE, "rb") as f:
+                    existing = fernet.decrypt(f.read()).decode()
+            except (FileNotFoundError, InvalidToken):
+                existing = ""
+            existing += f"{Username}:{ph.hash(Password)}\n" #apprends username, then the hashed password using Argon2 (which also hashes)
+            with open(SHADOWS_FILE, "wb") as f:
+                f.write(fernet.encrypt(existing.encode()))
             with open("log.txt", "a") as f:
                 f.write(f"Account created: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
             print("Account created successfully.")
