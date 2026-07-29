@@ -1,15 +1,19 @@
 import socket
 import threading
+from cryptography.fernet import Fernet
 
 HOST = "127.0.0.1"
 PORT = 5555
 
-clients = {}  
+with open("secret.key", "rb") as f:
+    fernet = Fernet(f.read())
+
+clients = {}
 clients_lock = threading.Lock()
 
 
 def handle_client(conn, addr):
-    display_name = conn.recv(1024).decode().strip()
+    display_name = fernet.decrypt(conn.recv(1024)).decode().strip()
     with clients_lock:
         clients[display_name] = conn
     print(f"{display_name} connected from {addr}")
@@ -17,19 +21,19 @@ def handle_client(conn, addr):
         data = conn.recv(1024)
         if not data:
             break
-        text = data.decode().strip()
+        text = fernet.decrypt(data).decode().strip()
         #list command
         if text == "list":
             with clients_lock:
                 names = ", ".join(clients.keys())
-            conn.sendall(names.encode())
+            conn.sendall(fernet.encrypt(names.encode()))
         #msg command
         elif text.startswith("msg "):
             _, target, message = text.split(" ", 2)
             with clients_lock:
                 target_conn = clients.get(target)
             if target_conn:
-                target_conn.sendall(f"{display_name}: {message}".encode())
+                target_conn.sendall(fernet.encrypt(f"{display_name}: {message}".encode()))
 
 
 def main():

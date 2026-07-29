@@ -8,6 +8,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import socket
 import threading
+from cryptography.fernet import Fernet
 
 USERS_FILE = "users.json"
 SHADOWS_FILE = "shadows.txt"
@@ -15,6 +16,9 @@ SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 5555
 
 ph = PasswordHasher()
+
+with open("secret.key", "rb") as f:
+    fernet = Fernet(f.read())
 
 #Function to load users
 def load_users():
@@ -111,7 +115,7 @@ def main():
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((SERVER_HOST, SERVER_PORT))
-                sock.sendall(Display_Name.encode())
+                sock.sendall(fernet.encrypt(Display_Name.encode()))
                 print(f"Connected to chat server as {Display_Name}.")
                 print(f"List of commands:\nlogout\nlist\nmsg <username> <message>\n------------------------")
 
@@ -121,7 +125,7 @@ def main():
                         data = sock.recv(1024)
                         if not data:
                             break
-                        print(data.decode())
+                        print(fernet.decrypt(data).decode())
                 threading.Thread(target=receive, daemon=True).start()
 
                 #Loop for commands the user will send
@@ -129,7 +133,7 @@ def main():
                     command = input()
                     if command == "logout":
                         break
-                    sock.sendall(command.encode())
+                    sock.sendall(fernet.encrypt(command.encode()))
                 sock.close()
                 print("You have successfully logged out.")
             except ConnectionRefusedError:
