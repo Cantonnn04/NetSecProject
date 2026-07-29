@@ -131,9 +131,9 @@ def main():
                 #Loop for commands the user will send
                 while True:
                     command = input()
+                    sock.sendall(fernet.encrypt(command.encode()))
                     if command == "logout":
                         break
-                    sock.sendall(fernet.encrypt(command.encode()))
                 sock.close()
                 print("You have successfully logged out.")
             except ConnectionRefusedError:
