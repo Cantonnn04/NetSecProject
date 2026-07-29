@@ -1,2 +1,6 @@
 Cantonnn:$argon2id$v=19$m=65536,t=3,p=4$IfJM7U91KkHYfSiJjaIrXw$ZBp8RyX3qb3cBJJVtmSo+yYvBM99I35b7HquysnSk74
 Daniel:$argon2id$v=19$m=65536,t=3,p=4$TdJtR/beA5rZ93GbxpfDfA$aQvd1Sz6gklzGTwwiWBDj7HlBXS/jZCM06xsGbpweWk
+daniel:$argon2id$v=19$m=65536,t=3,p=4$x4sxy8zmcoyv5XVFCdRI5g$q/uAbt8d/af/rKq7ujKvmT39U7Z9YguhenfUTkeN9rc
+daniel1:$argon2id$v=19$m=65536,t=3,p=4$NG4ZYqXwla1pyN3sVxCqbQ$ZYfUAfLs1USyft0FSYLoZBUIbozbcw6MmbpIjaZqFCc
+daniel2:$argon2id$v=19$m=65536,t=3,p=4$uU5raf0GO5DovD4RSWRgEA$AP1f4bNX/8FGwisUcKOE919nbZXFr5UL6easpIn+EuE
+daniel3:$argon2id$v=19$m=65536,t=3,p=4$aXFh3IVKLa/X3Eif+m9jCQ$Sv+qlVU8rZC4Z0d1mqRuNsi+VaeFLBEYN4hUXUhz8g4
