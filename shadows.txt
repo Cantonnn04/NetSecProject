@@ -1,0 +1,2 @@
+Cantonnn:$argon2id$v=19$m=65536,t=3,p=4$IfJM7U91KkHYfSiJjaIrXw$ZBp8RyX3qb3cBJJVtmSo+yYvBM99I35b7HquysnSk74
+Daniel:$argon2id$v=19$m=65536,t=3,p=4$TdJtR/beA5rZ93GbxpfDfA$aQvd1Sz6gklzGTwwiWBDj7HlBXS/jZCM06xsGbpweWk
