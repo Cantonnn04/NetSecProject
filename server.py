@@ -12,6 +12,7 @@ result = subprocess.run(
     ["powershell", "-NoProfile", "-Command", cmd],
 )
 
+#Create symmetric key
 def create_secret2_key():
     subprocess.run(["python", "generate_key2.py"])
     with open("secret2.key", "rb") as f:
@@ -21,14 +22,16 @@ def create_secret2_key():
 HOST = "127.0.0.1"
 PORT = 5555
 
-
+#For listing online users & messaging
 clients = {}
 clients_lock = threading.Lock()
 
 
 def handle_client(conn, addr):
+    #Getting and saving display name
     display_name = (conn.recv(1024)).decode().strip()
     with clients_lock:
+        #Stopping connection of same user multiple times
         if display_name in clients:
             fernet2 = create_secret2_key()
             conn.sendall(fernet2.encrypt(b"User already connected to server."))
@@ -40,8 +43,10 @@ def handle_client(conn, addr):
         data = conn.recv(1024)
         if not data:
             break
+        #Getting symmetric key
         with open("secret2.key", "rb") as f:
                 fernet2 = Fernet(f.read())
+        #Decoding data from user, and either listing users, sending message, or logging out.
         text = fernet2.decrypt(data).decode().strip()
         #list command
         if text == "list":
@@ -68,7 +73,7 @@ def handle_client(conn, addr):
             del clients[display_name]
             print(f"{display_name} disconnected from {addr}")
 
-
+#Creating server (Mostly stolen from labs)
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
