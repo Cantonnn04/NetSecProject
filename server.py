@@ -36,12 +36,14 @@ def handle_client(conn, addr):
         data = conn.recv(1024)
         if not data:
             break
-        text = fernet.decrypt(data).decode().strip()
+        with open("secret2.key", "rb") as f:
+                fernet2 = Fernet(f.read())
+        text = fernet2.decrypt(data).decode().strip()
         #list command
         if text == "list":
             with clients_lock:
                 names = ", ".join(clients.keys())
-            conn.sendall(fernet.encrypt(names.encode()))
+            conn.sendall(fernet2.encrypt(names.encode()))
         #msg command
         elif text.startswith("msg "):
             parts = text.split(" ", 2)
@@ -52,7 +54,7 @@ def handle_client(conn, addr):
                 target_conn = clients.get(target)
             if target_conn:
                 #print("Test2")
-                target_conn.sendall(fernet.encrypt(f"{display_name}: {message}".encode()))
+                target_conn.sendall(fernet2.encrypt(f"{display_name}: {message}".encode()))
                 with open("log.txt", "a") as f:
                     f.write(f"User {target} received a message from user {display_name} at {datetime.now(timezone.utc).isoformat()}\n")
                     #f.write("Test\n")

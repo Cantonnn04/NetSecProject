@@ -1,5 +1,7 @@
 import time
 import json
+import os
+import subprocess
 import re
 import uuid
 import getpass
@@ -16,6 +18,17 @@ SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 5555
 
 ph = PasswordHasher()
+
+#Function to create secret2.key
+def create_secret2_key():
+    subprocess.run(["python", "generate_key2.py"])
+    with open("secret2.key", "rb") as f:
+        fernet2 = Fernet(f.read())
+    return fernet2
+#Function to destroy secret2.key
+def destroy_secret2_key():
+    os.remove("secret2.key")
+    return " "
 
 with open("secret.key", "rb") as f:
     fernet = Fernet(f.read())
@@ -123,12 +136,16 @@ def main():
                         data = sock.recv(1024)
                         if not data:
                             break
-                        print(fernet.decrypt(data).decode())
+                        with open("secret2.key", "rb") as f:
+                            fernet2 = Fernet(f.read())
+                        print(fernet2.decrypt(data).decode())
+                        destroy_secret2_key()
                 threading.Thread(target=receive, daemon=True).start()
                 #Loop for commands the user will send
                 while True:
                     command = input()
-                    sock.sendall(fernet.encrypt(command.encode()))
+                    fernet2 = create_secret2_key()
+                    sock.sendall(fernet2.encrypt(command.encode()))
                     if command == "logout":
                         break
                 sock.close()
