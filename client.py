@@ -80,7 +80,7 @@ def main():
             users = load_users()
             if any(user["username"] == Username and user.get("disabled") for user in users):
                 with open("log.txt", "a") as f:
-                    f.write(f"Disabled account logon attempt for: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
+                    f.write(f"Locked account logon attempt for: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
                 print("Account locked. Please contact administrator.")
                 subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 break
