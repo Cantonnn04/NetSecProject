@@ -44,7 +44,10 @@ def handle_client(conn, addr):
             conn.sendall(fernet.encrypt(names.encode()))
         #msg command
         elif text.startswith("msg "):
-            _, target, message = text.split(" ", 2)
+            parts = text.split(" ", 2)
+            if len(parts) < 3:
+                continue
+            _, target, message = parts
             with clients_lock:
                 target_conn = clients.get(target)
             if target_conn:

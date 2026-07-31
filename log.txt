@@ -33,3 +33,19 @@ Account logged in: Cantonnn2 at 2026-07-29T22:17:04.920212+00:00, IP: 169.254.83
 Account logged in: Cantonnn at 2026-07-29T22:17:30.970881+00:00, IP: 169.254.83.107
 User Cantonnn2 received a message from user Cantonnn at 2026-07-29T22:17:38.156974+00:00
 User Cantonnn2 received a message from user Cantonnn2 at 2026-07-29T22:17:47.112246+00:00
+Account created: Cantonnn at 2026-07-30T23:49:13.583024+00:00, IP: 169.254.83.107
+Log on attempt for non-existent username at 2026-07-30T23:52:10.341734+00:00, IP: 169.254.83.107
+Log on attempt for non-existent username at 2026-07-30T23:52:21.109372+00:00, IP: 169.254.83.107
+Log on attempt for non-existent username at 2026-07-30T23:53:31.544629+00:00, IP: 169.254.83.107
+Account created: Cantonnn at 2026-07-30T23:55:11.236806+00:00, IP: 169.254.83.107
+Account logged in: Cantonnn at 2026-07-30T23:55:19.511223+00:00, IP: 169.254.83.107
+Account logged in: Cantonnn at 2026-07-30T23:55:48.013405+00:00, IP: 169.254.83.107
+Account created: Test_User at 2026-07-30T23:56:21.196921+00:00, IP: 169.254.83.107
+Account logged in: Test_User at 2026-07-30T23:56:31.923976+00:00, IP: 169.254.83.107
+Account logged in: Cantonnn at 2026-07-30T23:58:01.743674+00:00, IP: 169.254.83.107
+Account logged in: Test_User at 2026-07-30T23:58:17.739846+00:00, IP: 169.254.83.107
+User Canton received a message from user TestUser at 2026-07-30T23:58:26.478741+00:00
+User TestUser received a message from user Canton at 2026-07-30T23:58:36.522892+00:00
+Account logged in: Cantonnn at 2026-07-31T00:00:59.376636+00:00, IP: 169.254.83.107
+Account logged in: Test_User at 2026-07-31T00:01:13.599807+00:00, IP: 169.254.83.107
+User Canton received a message from user TestUser at 2026-07-31T00:01:31.660248+00:00
