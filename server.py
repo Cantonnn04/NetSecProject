@@ -16,18 +16,16 @@ result = subprocess.run(
 HOST = "127.0.0.1"
 PORT = 5555
 
-with open("secret.key", "rb") as f:
-    fernet = Fernet(f.read())
 
 clients = {}
 clients_lock = threading.Lock()
 
 
 def handle_client(conn, addr):
-    display_name = fernet.decrypt(conn.recv(1024)).decode().strip()
+    display_name = (conn.recv(1024)).decode().strip()
     with clients_lock:
         if display_name in clients:
-            conn.sendall(fernet.encrypt(b"User already connected to server."))
+            conn.sendall((b"User already connected to server."))
             conn.close()
             return
         clients[display_name] = conn

