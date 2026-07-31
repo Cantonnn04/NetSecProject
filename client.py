@@ -12,13 +12,6 @@ import socket
 import threading
 from cryptography.fernet import Fernet, InvalidToken
 
-USERS_FILE = "users.json"
-SHADOWS_FILE = "shadows.txt"
-SERVER_HOST = "127.0.0.1"
-SERVER_PORT = 5555
-
-ph = PasswordHasher()
-
 #Function to create secret2.key
 def create_secret2_key():
     subprocess.run(["python", "generate_key2.py"])
@@ -36,14 +29,14 @@ with open("secret.key", "rb") as f:
 #Function to load users (file is encrypted at rest)
 def load_users():
     try:
-        with open(USERS_FILE, "rb") as f:
+        with open("users.json", "rb") as f:
             return json.loads(fernet.decrypt(f.read()))
     except (FileNotFoundError, InvalidToken, json.JSONDecodeError):
         return []
 
 #Function to save users
 def save_users(users):
-    with open(USERS_FILE, "wb") as f:
+    with open("users.json", "wb") as f:
         f.write(fernet.encrypt(json.dumps(users, indent=4).encode()))
 
 def main():
@@ -69,7 +62,7 @@ def main():
             #Loads shadows.txt
             shadows = {}
             try:
-                with open(SHADOWS_FILE, "rb") as f:
+                with open("shadows.txt", "rb") as f:
                     for line in fernet.decrypt(f.read()).decode().splitlines():
                         shadow_username, hashed_password = line.strip().split(":", 1)
                         shadows[shadow_username] = hashed_password
@@ -91,7 +84,7 @@ def main():
                 break
             #Checks if password is correct
             try:
-                ph.verify(shadows[Username], Password)
+                PasswordHasher().verify(shadows[Username], Password)
             except VerifyMismatchError:
                 accountTries += 1
                 if accountTries >= 3:
@@ -126,7 +119,7 @@ def main():
             Display_Name = next((user["display_name"] for user in users if user["username"] == Username), Username)
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock.connect((SERVER_HOST, SERVER_PORT))
+                sock.connect(("127.0.0.1", 5555))
                 sock.sendall(fernet.encrypt(Display_Name.encode()))
                 print(f"Connected to chat server as {Display_Name}.")
                 print(f"List of commands:\nlogout\nlist\nmsg <username> <message>\n------------------------")
@@ -194,12 +187,12 @@ def main():
             save_users(users)
             #Appends to shadows.txt
             try:
-                with open(SHADOWS_FILE, "rb") as f:
+                with open("shadows.txt", "rb") as f:
                     existing = fernet.decrypt(f.read()).decode()
             except (FileNotFoundError, InvalidToken):
                 existing = ""
-            existing += f"{Username}:{ph.hash(Password)}\n" #apprends username, then the hashed password using Argon2 (which also hashes)
-            with open(SHADOWS_FILE, "wb") as f:
+            existing += f"{Username}:{PasswordHasher().hash(Password)}\n" #apprends username, then the hashed password using Argon2 (which also hashes)
+            with open("shadows.txt", "wb") as f:
                 f.write(fernet.encrypt(existing.encode()))
             with open("log.txt", "a") as f:
                 f.write(f"Account created: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")

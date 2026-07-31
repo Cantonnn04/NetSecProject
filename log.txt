@@ -61,3 +61,9 @@ User Canton received a message from user TestUser at 2026-07-31T00:32:48.131791+
 Account logged in: Cantonnn at 2026-07-31T00:34:35.291940+00:00, IP: 169.254.83.107
 Account logged in: Test_User at 2026-07-31T00:34:47.731628+00:00, IP: 169.254.83.107
 User Canton received a message from user TestUser at 2026-07-31T00:35:11.898947+00:00
+Account created: Cantonnn at 2026-07-31T00:54:54.102900+00:00, IP: 169.254.83.107
+Account logged in: Cantonnn at 2026-07-31T00:55:02.553549+00:00, IP: 169.254.83.107
+Account created: Test_User at 2026-07-31T00:55:22.146697+00:00, IP: 169.254.83.107
+Account logged in: Test_User at 2026-07-31T00:55:34.727123+00:00, IP: 169.254.83.107
+User Canton received a message from user TestUser at 2026-07-31T00:55:44.495408+00:00
+User TestUser received a message from user Canton at 2026-07-31T00:55:53.861243+00:00
