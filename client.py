@@ -141,8 +141,13 @@ def main():
                 #Loop for commands the user will send
                 while True:
                     command = input()
-                    fernet2 = create_secret2_key()
-                    sock.sendall(fernet2.encrypt(command.encode()))
+                    #fernet2 = create_secret2_key()
+                    if len(command) > 200:
+                        print("Command too long.")
+                        continue
+                    else:
+                        fernet2 = create_secret2_key()
+                        sock.sendall(fernet2.encrypt(command.encode()))
                     if command == "logout":
                         break
                 sock.close()

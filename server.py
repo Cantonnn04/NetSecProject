@@ -5,13 +5,18 @@ from datetime import datetime, timezone
 import subprocess
 
 #Killing anython on port 5555 because the server doesn't close itself lol
-import subprocess
 
 cmd = r"""netstat -ano | Select-String ':5555\s' | Where-Object { $_ -match 'LISTENING' } | ForEach-Object { Stop-Process -Id ($_.Line.Trim() -split '\s+')[-1] -Force }"""
 
 result = subprocess.run(
     ["powershell", "-NoProfile", "-Command", cmd],
 )
+
+def create_secret2_key():
+    subprocess.run(["python", "generate_key2.py"])
+    with open("secret2.key", "rb") as f:
+        fernet2 = Fernet(f.read())
+    return fernet2
 
 HOST = "127.0.0.1"
 PORT = 5555
@@ -25,7 +30,8 @@ def handle_client(conn, addr):
     display_name = (conn.recv(1024)).decode().strip()
     with clients_lock:
         if display_name in clients:
-            conn.sendall((b"User already connected to server."))
+            fernet2 = create_secret2_key()
+            conn.sendall(fernet2.encrypt(b"User already connected to server."))
             conn.close()
             return
         clients[display_name] = conn
