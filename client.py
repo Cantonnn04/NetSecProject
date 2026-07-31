@@ -45,7 +45,6 @@ def main():
     choice = input("Choose an option (1 or 2): ")
 
     if choice == "1": #Login
-        subprocess.run("pears.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         accountTries = 0 #Used for account lockout
         #General anti-bruteforce
         tries = 0
@@ -61,6 +60,7 @@ def main():
             Username = input("Username: ")
             Password = getpass.getpass("Password: ")
             #Loads shadows.txt
+            subprocess.run("pears.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             shadows = {}
             try:
                 with open("shadows.txt", "r") as f:
@@ -102,10 +102,10 @@ def main():
                     print("Too many failed attempts. Account locked. Please contact administrator.")
                     subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     break
-                time.sleep(5)
                 with open("log.txt", "a") as f:
                     f.write(f"Login attempt for: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
                 print("Invalid username or password.")
+                subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 continue
 
             #Once password check is done, updates last login time
@@ -201,13 +201,14 @@ def main():
             existing += f"{Username}:{PasswordHasher().hash(Password)}\n" #apprends username, then the hashed password using Argon2 (which also hashes)
             with open("shadows.txt", "w") as f:
                 f.write(existing)
+            subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             with open("log.txt", "a") as f:
                 f.write(f"Account created: {Username} at {datetime.now(timezone.utc).isoformat()}, IP: {socket.gethostbyname(socket.gethostname())}\n")
             print("Account created successfully.")
-            subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     else:
         subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("Invalid option.")
+    subprocess.run("bananas.bat", stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 if __name__ == "__main__":
     main()
